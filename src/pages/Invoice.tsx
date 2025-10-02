@@ -48,7 +48,7 @@ const Invoice = () => {
       amount: 5000.0,
     },
   ];
-  const [items, setItems] = useState(invoiceItems);
+  const [items, _] = useState(invoiceItems);
 
   const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
   const discountRate = 0.025; // 2.5%

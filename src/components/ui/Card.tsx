@@ -1,4 +1,3 @@
-import { TbCategory2 } from "react-icons/tb";
 import clsx from "clsx";
 import CategoryIcon from "./icons/categoryIcon";
 
@@ -21,7 +20,6 @@ const statusStyles: Record<Status, string> = {
 };
 
 export function OverviewCard({
-  icon = <TbCategory2 className="w-10 h-10 text-primary" />,
   title,
   amount,
   status,
