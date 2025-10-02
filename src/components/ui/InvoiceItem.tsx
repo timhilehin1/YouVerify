@@ -1,6 +1,7 @@
 import clsx from "clsx";
+import { formatCurrency } from "../../utils/constant";
 
-type InvoiceStatus = "draft" | "overdue" | "paid" | "pending";
+type InvoiceStatus = "draft" | "overdue" | "paid" | "pending" | "unpaid";
 
 interface InvoiceItemProps {
   id: string;
@@ -16,6 +17,7 @@ const statusClasses: Record<InvoiceStatus, string> = {
   pending: "text-[#F5A623] bg-[#FFF8E6] border border-[#F5A623]/20",
   overdue: "text-[#D0021B] bg-[#FFEDED] border border-[#D0021B]/20",
   draft: "text-[#666F77] bg-[#F2F3F5] border border-[#666F77]/20",
+  unpaid: "text-[#B54708] bg-[#FFF4E5] border border-[#B54708]/20",
 };
 export function InvoiceItem({
   id,
@@ -27,6 +29,7 @@ export function InvoiceItem({
 }: InvoiceItemProps) {
   const statusClassName = statusClasses[status];
   const formattedStatus = status.toUpperCase();
+  const formattedAmount = formatCurrency(Number(amount));
 
   return (
     <div
@@ -41,9 +44,11 @@ export function InvoiceItem({
       )}
     >
       <div className="flex flex-col gap-1 md:col-span-1">
-        <p className="text-coal text-sm">{`Invoice - ${id}`}</p>
+        <p className="text-coal text-sm font-medium">{`${id}`}</p>
 
-        <p className="font-medium text-coal text-sm md:hidden">{amount}</p>
+        <p className="font-medium text-coal text-sm md:hidden">
+          {formattedAmount}
+        </p>
       </div>
 
       <div className="hidden md:flex flex-col gap-2 items-start md:col-span-1">
@@ -55,7 +60,7 @@ export function InvoiceItem({
 
       <div className="flex flex-col gap-2 items-end md:col-span-1   md:justify-self-end">
         <p className="font-medium text-coal md:text-sm hidden md:block">
-          {amount}
+          {formattedAmount}
         </p>
 
         <span

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import { ActivityItem } from "../components/ui/ActivityItem";
 import { Button } from "../components/ui/Button";
@@ -11,58 +11,119 @@ import { Modal } from "../components/ui/Modal";
 import CheckIcon from "../components/ui/icons/checkIcon";
 import logo from "../assets/Logo.png";
 import { Tabs } from "../components/ui/Tab";
+import {
+  formatCurrency,
+  formatCurrentDate,
+  formatDate,
+  reminders,
+} from "../utils/constant";
+import { getInvoices, getInvoiceStats } from "../lib/services/Invoice";
+import { toast } from "sonner";
+import {
+  InvoiceItemSkeleton,
+  OverviewCardSkeleton,
+} from "../components/ui/Skeleton";
+import type { InvoiceData } from "../interfaces/Invoice.model";
+import { supabase } from "../lib/supabase";
 
 const Invoice = () => {
+  const [invoices, setInvoices] = useState<InvoiceData[]>([]);
+  const [stats, setStats] = useState<
+    Record<string, { count: number; total: number }>
+  >({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData>(
+    {} as InvoiceData
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [invoiceData, statsData] = await Promise.all([
+          getInvoices(),
+          getInvoiceStats(),
+        ]);
+        setInvoices(invoiceData || []);
+        setStats(statsData || {});
+      } catch (err: any) {
+        console.error(err);
+        toast.error(
+          err.message || "Something went wrong while loading invoices."
+        );
+        setError(err.message || "Something went wrong while loading invoices.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Initial fetch
+    fetchData();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel("invoices-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "invoices",
+        },
+        (payload) => {
+          console.log("Change received!", payload);
+
+          // Handle different event types
+          if (payload.eventType === "INSERT") {
+            setInvoices((prev) => [payload.new as InvoiceData, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setInvoices((prev) =>
+              prev.map((invoice) =>
+                invoice.id === (payload.new as InvoiceData).id
+                  ? (payload.new as InvoiceData)
+                  : invoice
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setInvoices((prev) =>
+              prev.filter(
+                (invoice) => invoice.id !== (payload.old as InvoiceData).id
+              )
+            );
+          }
+
+          // Refresh stats after any change
+          getInvoiceStats().then((statsData) => setStats(statsData || {}));
+        }
+      )
+      .subscribe((status) => {
+        console.log("Realtime connection status:", status);
+      });
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
   const [fullscreenModal, setFullscreenModal] = useState(false);
   const handleInvoiceAction = () => {};
-  const handleInvoiceDetails = () => {
+
+  const handleInvoiceDetails = (invoice: InvoiceData) => {
+    setSelectedInvoice(invoice);
     setFullscreenModal(true);
   };
-  const invoiceItems = [
-    {
-      id: 1,
-      description: "Email Marketing",
-      quantity: 10,
-      rate: 1500,
-      amount: 15000.0,
-    },
-    {
-      id: 2,
-      description: "Video Production",
-      quantity: 5,
-      rate: 2000,
-      amount: 10000.0,
-    },
-    {
-      id: 3,
-      description: "Social Media Management",
-      quantity: 8,
-      rate: 800,
-      amount: 6400.0,
-    },
-    {
-      id: 4,
-      description: "Website Design",
-      quantity: 1,
-      rate: 5000,
-      amount: 5000.0,
-    },
-  ];
-  const [items, _] = useState(invoiceItems);
 
-  const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
+  // Calculate totals from selected invoice items
+  const subtotal =
+    selectedInvoice?.invoice_items?.reduce(
+      (sum, item) => sum + Number(item.unit_price),
+      0
+    ) || 0;
   const discountRate = 0.025; // 2.5%
   const discount = subtotal * discountRate;
   const totalAmountDue = subtotal - discount;
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-
   return (
     <Layout>
       <div className="flex flex-col gap-4 lg:flex-row items-start lg:items-center justify-between mb-[1.25rem] lg:mb-[2.5rem]">
@@ -74,30 +135,40 @@ const Invoice = () => {
       </div>
       {/* //overview cards */}
       <section className="flex w-full flex-wrap md:flex-nowrap gap-6 lg:gap-8 justify-between mb-[1.25rem] lg:mb-[2.5rem]">
-        <OverviewCard
-          title="TOTAL OVERDUE"
-          amount="120000"
-          status="overdue"
-          count={128}
-        />
-        <OverviewCard
-          title="TOTAL UNPAID"
-          amount="5400.02"
-          status="unpaid"
-          count={454676}
-        />
-        <OverviewCard
-          title="TOTAL PAID"
-          amount="777733.3"
-          status="paid"
-          count={8}
-        />
-        <OverviewCard
-          title="TOTAL DRAFT"
-          amount="5400"
-          status="draft"
-          count={3}
-        />
+        {loading ? (
+          <>
+            {[1, 2, 3, 4].map((item) => (
+              <OverviewCardSkeleton key={item} />
+            ))}
+          </>
+        ) : (
+          <>
+            <OverviewCard
+              title="TOTAL OVERDUE"
+              amount={stats.overdue?.total || 0}
+              status="overdue"
+              count={stats.overdue?.count || 0}
+            />
+            <OverviewCard
+              title="TOTAL UNPAID"
+              amount={stats.unpaid?.total || 0}
+              status="unpaid"
+              count={stats.unpaid?.count || 0}
+            />
+            <OverviewCard
+              title="TOTAL PAID"
+              amount={stats.paid?.total || 0}
+              status="paid"
+              count={stats.paid?.count || 0}
+            />
+            <OverviewCard
+              title="TOTAL DRAFT"
+              amount={stats.draft?.total || 0}
+              status="draft"
+              count={stats.draft?.count || 0}
+            />
+          </>
+        )}
       </section>
 
       {/* action cards */}
@@ -136,19 +207,27 @@ const Invoice = () => {
           </header>
           <main>
             <p className="text-coal font-medium uppercase mb-4">
-              Today - 27th November, 2022
+              Today - {formatCurrentDate()}
             </p>
             <div className="space-y-6 w-full">
-              {[1, 2, 3, 4, 5, 6].map((item) => (
-                <InvoiceItem
-                  onClick={handleInvoiceDetails}
-                  key={item}
-                  id="1023494-2304"
-                  dueDate="May 19th, 2023"
-                  amount="$1,311,750.12"
-                  status="draft" // Try 'overdue', 'pending', or 'draft'
-                />
-              ))}
+              {loading ? (
+                <>
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <InvoiceItemSkeleton key={i} />
+                  ))}
+                </>
+              ) : (
+                invoices.map((invoice) => (
+                  <InvoiceItem
+                    key={invoice.id}
+                    id={invoice.invoice_id}
+                    dueDate={invoice.due_date}
+                    amount={invoice.total_amount}
+                    status={invoice.status}
+                    onClick={() => handleInvoiceDetails(invoice)}
+                  />
+                ))
+              )}
             </div>
           </main>
         </div>
@@ -162,11 +241,11 @@ const Invoice = () => {
               <ActivityItem
                 key={item}
                 description="Created Invoice"
-                actorName="Olaniyi Ojo Adewale"
+                actorName="Oladapo Timilehin"
                 actionTitle="Invoice creation"
                 timestamp="Yesterday, 12:05 PM"
                 invoiceId="00239434"
-                adminName="Olaniyi Ojo Adewale"
+                adminName="Oladapo Timilehin"
               />
             ))}
           </main>
@@ -182,14 +261,38 @@ const Invoice = () => {
             <header className="flex flex-col mb-6 space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-2 lg:space-y-1">
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-coal break-words">
-                  Invoice - 1023494 - 2304
+                  {selectedInvoice.invoice_id}
                 </h2>
                 <p className="text-primary text-sm lg:text-base">
                   View the details and activity of this invoice
                 </p>
                 <div className="pt-1">
-                  <span className="text-[#F5A623] bg-[#FFF8E6] border border-[#F5A623]/20 px-3 py-1.5 rounded-full font-medium capitalize text-[.625rem] inline-flex">
-                    pending
+                  <span
+                    className={`
+                      ${
+                        selectedInvoice.status === "paid"
+                          ? "text-[#129043] bg-[#E6FFF0] border-[#129043]/20"
+                          : ""
+                      }
+                      ${
+                        selectedInvoice.status === "unpaid"
+                          ? "text-[#F5A623] bg-[#FFF8E6] border-[#F5A623]/20"
+                          : ""
+                      }
+                      ${
+                        selectedInvoice.status === "overdue"
+                          ? "text-[#D32F2F] bg-[#FFEBEE] border-[#D32F2F]/20"
+                          : ""
+                      }
+                      ${
+                        selectedInvoice.status === "draft"
+                          ? "text-[#666F77] bg-[#F6F8FA] border-[#666F77]/20"
+                          : ""
+                      }
+                      border px-3 py-1.5 rounded-full font-medium capitalize text-[.625rem] inline-flex
+                    `}
+                  >
+                    {selectedInvoice.status}
                   </span>
                 </div>
               </div>
@@ -209,14 +312,20 @@ const Invoice = () => {
             </header>
 
             <section className="reminders w-full p-5 rounded-[2rem] border border-[#E3E6EF] flex items-center gap-3 mb-6 flex-wrap">
-              <p className="text-xs text-primary">REMINDERS</p>
-              {[1, 2, 3, 4, 5].map((item) => (
+              <p className="text-xs text-primary hidden sm:block">REMINDERS</p>
+              {reminders.map((item) => (
                 <span
-                  key={item}
-                  className="text-coal bg-[#E6FFF0] border border-[#129043]/20 px-3 py-2 rounded-full font-medium capitalize text-[.625rem] flex items-center gap-3"
+                  key={item.id}
+                  className={`text-coal px-3 py-2 rounded-full font-medium capitalize text-[.625rem] flex items-center gap-3 ${
+                    item.sent
+                      ? "bg-[#E6FFF0] border border-[#129043]/20"
+                      : "bg-white border border-[#E3E6EF]"
+                  }`}
                 >
-                  14 days before due date
-                  <CheckIcon className="w-2 h-2 text-[#2DB260]" />
+                  {item.label}
+                  {item.sent && (
+                    <CheckIcon className="w-2 h-2 text-[#2DB260]" />
+                  )}
                 </span>
               ))}
             </section>
@@ -251,12 +360,14 @@ const Invoice = () => {
                     <div className="space-y-1.5">
                       <p className="text-primary text-xs">CUSTOMER</p>
                       <div className="space-y-1">
-                        <p className="text-coal font-normal mt-1">
-                          Olaniyi Ojo Adewale
+                        <p className="text-coal font-normal mt-1 capitalize">
+                          {selectedInvoice.recipient_name || "N/A"}
                         </p>
-                        <p className="text-primary text-xs">0000000000</p>
                         <p className="text-primary text-xs">
-                          info@fabulousenterise.co
+                          {selectedInvoice.recipient_phone || "N/A"}
+                        </p>
+                        <p className="text-primary text-xs">
+                          {selectedInvoice.recipient_email || "N/A"}
                         </p>
                       </div>
                     </div>
@@ -268,15 +379,21 @@ const Invoice = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                       <div>
                         <p className="text-[#666f77] text-[10px]">INVOICE NO</p>
-                        <p className="text-coal text-xs">10000000</p>
+                        <p className="text-coal text-xs">
+                          {selectedInvoice.invoice_id}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[#666f77] text-[10px]">ISSUE DATE</p>
-                        <p className="text-coal text-xs">March 30th, 2023</p>
+                        <p className="text-coal text-xs">
+                          {formatDate(selectedInvoice.created_at!)}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[#666f77] text-[10px]">DUE DATE</p>
-                        <p className="text-coal text-xs">4th April, 2023</p>
+                        <p className="text-coal text-xs">
+                          {selectedInvoice.due_date}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[#666f77] text-[10px]">
@@ -296,22 +413,22 @@ const Invoice = () => {
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[500px]">
                       <tbody className="divide-y divide-[#E3E6EF]">
-                        {items.map((item) => (
+                        {selectedInvoice.invoice_items?.map((item) => (
                           <tr
                             key={item.id}
                             className="hover:bg-gray-50 transition-colors"
                           >
                             <td className="px-3 sm:px-6 py-3 sm:py-4 text-coal font-medium text-sm sm:text-base">
-                              {item.description}
+                              {item.item_name}
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 text-center text-coal text-sm sm:text-base">
                               {item.quantity}
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-coal text-sm sm:text-base">
-                              {formatCurrency(item.rate)}
+                              {formatCurrency(item.unit_price)}
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 text-right font-semibold text-coal text-sm sm:text-base">
-                              {formatCurrency(item.amount)}
+                              {formatCurrency(item.total_price)}
                             </td>
                           </tr>
                         ))}
@@ -362,14 +479,16 @@ const Invoice = () => {
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                     <div>
                       <p className="text-[#666f77] text-[10px]">ACCOUNT NAME</p>
-                      <p className="text-coal text-xs font-[600]">ITESIWAJU</p>
+                      <p className="text-coal text-xs font-[600]">
+                        Fabulous Enterprise
+                      </p>
                     </div>
                     <div>
                       <p className="text-[#666f77] text-[10px]">
                         ACCOUNT NUMBER
                       </p>
                       <p className="text-coal text-xs font-[600]">
-                        1111111111111111
+                        81381096283
                       </p>
                     </div>
                     <div>
@@ -382,7 +501,9 @@ const Invoice = () => {
                     </div>
                     <div>
                       <p className="text-[#666f77] text-[10px]">BANK NAME</p>
-                      <p className="text-coal text-xs font-[600]">GTB</p>
+                      <p className="text-coal text-xs font-[600]">
+                        PAYSTACK TITAN
+                      </p>
                     </div>
                     <div>
                       <p className="text-[#666f77] text-[10px]">BANK ADDRESS</p>
@@ -405,12 +526,12 @@ const Invoice = () => {
                   {[1, 2, 354, 8484, 7, 8].map((item) => (
                     <ActivityItem
                       key={item}
-                      actorName="Olaniyi Ojo Adewale"
-                      description="You manually confirmed a partial payment of $503,000.00"
+                      actorName="Oladapo Timilehin"
+                      description="You manually confirmed a partial payment of $5000"
                       actionTitle="You"
                       timestamp="Yesterday, 12:05 PM"
                       invoiceId="00239434"
-                      adminName="Olaniyi Ojo Adewale"
+                      adminName="Oladapo Timilehin"
                     />
                   ))}
                 </div>
@@ -454,14 +575,14 @@ const Invoice = () => {
                             <div className="space-y-1.5">
                               <p className="text-primary text-xs">CUSTOMER</p>
                               <div className="space-y-1">
-                                <p className="text-coal font-normal mt-1">
-                                  Olaniyi Ojo Adewale
+                                <p className="text-coal font-normal mt-1 capitalize">
+                                  {selectedInvoice.recipient_name}
                                 </p>
                                 <p className="text-primary text-xs">
-                                  0000000000
+                                  {selectedInvoice.recipient_phone}
                                 </p>
                                 <p className="text-primary text-xs">
-                                  info@fabulousenterise.co
+                                  {selectedInvoice.recipient_email}
                                 </p>
                               </div>
                             </div>
@@ -475,14 +596,16 @@ const Invoice = () => {
                                 <p className="text-[#666f77] text-[10px]">
                                   INVOICE NO
                                 </p>
-                                <p className="text-coal text-xs">10000000</p>
+                                <p className="text-coal text-xs">
+                                  {selectedInvoice.invoice_id}
+                                </p>
                               </div>
                               <div>
                                 <p className="text-[#666f77] text-[10px]">
                                   ISSUE DATE
                                 </p>
                                 <p className="text-coal text-xs">
-                                  March 30th, 2023
+                                  {selectedInvoice.created_at}
                                 </p>
                               </div>
                               <div>
@@ -490,7 +613,7 @@ const Invoice = () => {
                                   DUE DATE
                                 </p>
                                 <p className="text-coal text-xs">
-                                  4th April, 2023
+                                  {selectedInvoice.due_date}
                                 </p>
                               </div>
                               <div>
@@ -511,7 +634,7 @@ const Invoice = () => {
                           <div className="overflow-x-auto">
                             <table className="w-full min-w-[500px]">
                               <tbody className="divide-y divide-[#E3E6EF]">
-                                {items.map((item) => (
+                                {selectedInvoice?.invoice_items?.map((item) => (
                                   <tr
                                     key={item.id}
                                     className="hover:bg-gray-50 transition-colors"
@@ -523,10 +646,10 @@ const Invoice = () => {
                                       {item.quantity}
                                     </td>
                                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-right text-coal text-sm sm:text-base">
-                                      {formatCurrency(item.rate)}
+                                      {formatCurrency(item.unit_price)}
                                     </td>
                                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-right font-semibold text-coal text-sm sm:text-base">
-                                      {formatCurrency(item.amount)}
+                                      {formatCurrency(item.total_price)}
                                     </td>
                                   </tr>
                                 ))}
@@ -580,7 +703,7 @@ const Invoice = () => {
                                 ACCOUNT NAME
                               </p>
                               <p className="text-coal text-xs font-[600]">
-                                ITESIWAJU
+                                Fabulous Enterprise
                               </p>
                             </div>
                             <div>
@@ -588,7 +711,7 @@ const Invoice = () => {
                                 ACCOUNT NUMBER
                               </p>
                               <p className="text-coal text-xs font-[600]">
-                                1111111111111111
+                                8138109620
                               </p>
                             </div>
                             <div>
@@ -604,7 +727,7 @@ const Invoice = () => {
                                 BANK NAME
                               </p>
                               <p className="text-coal text-xs font-[600]">
-                                GTB
+                                PAYSTACK TITAN
                               </p>
                             </div>
                             <div>
@@ -621,7 +744,7 @@ const Invoice = () => {
                         <div className="p-4 rounded-[1rem] bg-[#F6F8FA] mt-2 w-full min-h-[60px]">
                           <span className="text-primary">NOTE</span>
                           <p className="text-[#666f77]">
-                            Thank you for your patronage
+                            {selectedInvoice.notes}
                           </p>
                         </div>
                       </section>
@@ -639,12 +762,12 @@ const Invoice = () => {
                           {[1, 2, 354, 8484, 7, 8].map((item) => (
                             <ActivityItem
                               key={item}
-                              actorName="Olaniyi Ojo Adewale"
-                              description="You manually confirmed a partial payment of $503,000.00"
+                              actorName="Oladapo Timilehin"
+                              description="You manually confirmed a partial payment of $5,000"
                               actionTitle="You"
                               timestamp="Yesterday, 12:05 PM"
                               invoiceId="00239434"
-                              adminName="Olaniyi Ojo Adewale"
+                              adminName="Oladapo"
                             />
                           ))}
                         </div>

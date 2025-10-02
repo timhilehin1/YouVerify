@@ -6,9 +6,9 @@ type Status = "paid" | "overdue" | "draft" | "unpaid";
 type OverviewCardProps = {
   icon?: React.ReactNode;
   title: string;
-  amount: string;
+  amount: number;
   status: Status;
-  count: number | string;
+  count: number;
   className?: string;
 };
 
@@ -26,7 +26,7 @@ export function OverviewCard({
   count,
   className = "",
 }: OverviewCardProps) {
-  const [whole = "0", cents] = amount.split(".");
+  const [whole = "0", cents] = amount.toString().split(".");
   const formattedWhole = Number(whole).toLocaleString();
 
   return (
