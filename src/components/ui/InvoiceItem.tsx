@@ -8,6 +8,7 @@ interface InvoiceItemProps {
   amount: string;
   status: InvoiceStatus;
   className?: string;
+  onClick: () => void;
 }
 
 const statusClasses: Record<InvoiceStatus, string> = {
@@ -22,12 +23,14 @@ export function InvoiceItem({
   amount,
   status,
   className,
+  onClick,
 }: InvoiceItemProps) {
   const statusClassName = statusClasses[status];
   const formattedStatus = status.toUpperCase();
 
   return (
     <div
+      onClick={onClick}
       className={clsx(
         "p-4 sm:p-6 cursor-pointer   w-full hover:bg-primary/5 transition",
 

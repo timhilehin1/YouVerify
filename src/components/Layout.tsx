@@ -5,6 +5,7 @@ import { RiHome5Line, RiSettingsLine } from "react-icons/ri";
 import { TbCategory2, TbHelpSquare } from "react-icons/tb";
 import { MdOutlineReceiptLong } from "react-icons/md";
 import { IoNotificationsOutline } from "react-icons/io5";
+import companyLogo from "../assets/company_logo.png";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,7 +43,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-            <span className="text-xl text-primary">MyApp</span>
+            <img src={companyLogo} alt="company logo" />
             <button
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden text-gray-500 hover:text-gray-700"

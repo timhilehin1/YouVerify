@@ -1,5 +1,5 @@
 import React from "react";
-import clsx from "clsx"; // Using clsx is cleaner for conditional classes
+import clsx from "clsx";
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -7,8 +7,7 @@ type ButtonProps = {
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   className?: string;
-  // ADDED: New prop to accept any Tailwind width utility (e.g., 'w-1/2', 'max-w-xs', 'w-auto')
-  widthClass?: string;
+  fullWidth?: boolean; // Control full width behavior
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export function Button({
@@ -18,10 +17,9 @@ export function Button({
   isLoading = false,
   disabled,
   className,
-  widthClass, // Destructure the new prop
+  fullWidth = false,
   ...props
 }: ButtonProps) {
-  // 1. UPDATED BASE: Removed hardcoded w-full and max-w-[230px]
   const base =
     "inline-flex items-center justify-center font-medium rounded-[2.5rem] cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed";
 
@@ -36,10 +34,9 @@ export function Button({
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-sm",
-    // Ensure padding is applied to maintain minimum size
-    md: "px-[1.5rem] lg:px-[2.5rem] py-[0.875rem] text-sm",
-    lg: "px-6 py-3 text-lg",
+    sm: "px-3 py-1.5 text-xs",
+    md: "px-4 sm:px-6 lg:px-8 py-2 sm:py-2.5 lg:py-3 text-xs sm:text-sm",
+    lg: "px-6 sm:px-8 lg:px-10 py-3 sm:py-3.5 lg:py-4 text-sm sm:text-base",
   };
 
   return (
@@ -49,13 +46,8 @@ export function Button({
         focus,
         variants[variant],
         sizes[size],
-
-        // 2. APPLY WIDTH LOGIC:
-        // Default to w-full (block behavior) AND apply the custom widthClass
-        // If widthClass is provided (e.g., 'w-auto'), it will override w-full.
-        widthClass || "w-full max-w-[230px]", // If no width is provided, revert to the original default.
-
-        className // Pass through any other classes if you extend props with a className
+        fullWidth && "w-full",
+        className
       )}
       disabled={isLoading || disabled}
       {...props}

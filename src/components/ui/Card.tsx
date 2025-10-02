@@ -1,5 +1,6 @@
 import { TbCategory2 } from "react-icons/tb";
 import clsx from "clsx";
+import CategoryIcon from "./icons/categoryIcon";
 
 type Status = "paid" | "overdue" | "draft" | "unpaid";
 
@@ -37,7 +38,9 @@ export function OverviewCard({
         className
       )}
     >
-      <div className="flex justify-start">{icon}</div>
+      <div className="flex justify-start">
+        <CategoryIcon className="w-10 h-10" />
+      </div>
       <div className="flex items-center gap-3">
         <h3 className="text-xs font-normal text-primary">{title}</h3>
         <span
