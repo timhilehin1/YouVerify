@@ -1,73 +1,129 @@
-# React + TypeScript + Vite
+# Invoice Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, full-featured invoice management application built with React 19 and powered by Supabase.
 
-Currently, two official plugins are available:
+##  Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend Framework:** React 19
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **Notifications:** Sonner
+- **Backend & Database:** Supabase
+- **Authentication:** Supabase Auth
+- **Testing:** [Vitest]
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- User authentication and authorization
+- Reead, update invoices
+- Real-time data synchronization
+- Responsive design for all devices
+- Toast notifications for user feedback
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📋 Prerequisites
+Before you begin, ensure you have the following installed:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Node.js** (v18.0.0 or higher)
+- **npm** package manager
+- **Git**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠️ Installation & Setup
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Clone the Repository
+
+```bash
+git clone [https://github.com/timhilehin1/YouVerify.git]
+cd YouVerify
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory and add the below Supabase credentials:
+
+```env
+VITE_SUPABASE_URL="https://dafydjpsyykdejvgfkaf.supabase.co"
+VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhZnlkanBzeXlrZGVqdmdma2FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODgyNDIsImV4cCI6MjA3NDk2NDI0Mn0.ZdJN6N6nwtlKlPf2gWPYY_A12kM4geP_Rq8--MvR20A"
+```
+
+
+## 🚀 Running the Application
+
+### Development Mode
+
+```bash
+npm run dev
+```
+
+The application will start at `http://localhost:5174` (default Vite port).
+
+### Production Build
+
+```bash
+npm run build
+```
+
+
+## 🧪 Running Tests
+```bash
+npm run test
+```
+
+
+## 📁 Project Structure
+```
+youVerify-test/
+├── src/
+│   ├── components/        # Reusable UI components
+│   ├── pages/            # Page components
+│   ├── services/         # API and Supabase services
+│   ├── utils/            # Utility functions
+│   ├── test/        # Test files
+│   ├── App.tsx           # Main App component
+│   └── main.tsx          # Application entry point
+├── public/               # Static assets
+├── .env.local          # Example environment variables
+└── package.json          # Project dependencies
+```
+
+## 🔑 Key Components Tested
+
+The following critical components have comprehensive test coverage:
+- Modal Component
+- Invoice list rendering
+
+## 🔐 Authentication
+The application uses Supabase Authentication with the following features:
+- Email/Password authentication
+- Protected routes
+
+**Test Credentials**
+```
+Email:admin@gmail.com
+Password: @Youverify123
+```
+
+## 🎨 UI/UX Features
+
+- Clean, modern interface with Tailwind CSS
+- Real-time toast notifications via Sonner
+- Responsive design for mobile, tablet, and desktop
+
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Issue:** Application won't start
+- **Solution:** Ensure all environment variables are correctly set in `.env.local` file
+
+
+
+
+**Note for Judges:** If you encounter any issues during setup, please contact me at [timilehinoladapo0@gmail.com]. I'm available to provide support and answer any questions about the implementation.
