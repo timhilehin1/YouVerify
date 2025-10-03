@@ -541,7 +541,7 @@ const Invoice = () => {
                     id: "details",
                     label: "Invoice Details",
                     content: (
-                      <section className="shadow-sm rounded-[2.5rem] p-6 bg-white border border-[#E3E6EF]">
+                      <section className="shadow-sm rounded-[2.5rem] p-3 bg-white border border-[#E3E6EF]">
                         <div className="p-6 rounded-[2.5rem] bg-[#FCDDEC] mb-6">
                           <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-6 mb-6">
                             <div className="space-y-1">
@@ -552,7 +552,7 @@ const Invoice = () => {
                                   src={logo}
                                   alt="logo"
                                 />
-                                <div className="space-y-1">
+                                <div className="space-y-1 flex-1 min-w-0">
                                   <p className="text-coal font-normal mt-1">
                                     Fabulous Enterprise
                                   </p>
