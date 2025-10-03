@@ -41,8 +41,6 @@ cd youVerify-test
 
 ```bash
 npm install
-# or
-yarn install
 ```
 
 ### 3. Environment Variables
