@@ -1,73 +1,190 @@
-# React + TypeScript + Vite
+# Invoice Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, full-featured invoice management application built with React 19 and powered by Supabase.
 
-Currently, two official plugins are available:
+##  Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend Framework:** React 19
+- **Build Tool:** Vite
+- **Styling:** Tailwind CSS
+- **Notifications:** Sonner
+- **Backend & Database:** Supabase
+- **Authentication:** Supabase Auth
+- **Testing:** [Vitest]
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- User authentication and authorization
+- Create, read, update, and delete invoices
+- Real-time data synchronization
+- Responsive design for all devices
+- Toast notifications for user feedback
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📋 Prerequisites
+Before you begin, ensure you have the following installed:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Node.js** (v18.0.0 or higher)
+- **npm** or **yarn** package manager
+- **Git**
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠️ Installation & Setup
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Clone the Repository
+
+```bash
+git clone [https://github.com/timhilehin1/YouVerify.git]
+cd youVerify-test
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+# or
+yarn install
 ```
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+**To get your Supabase credentials:**
+
+1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project (or create a new one)
+3. Navigate to **Settings** > **API**
+4. Copy the **Project URL** and **anon/public** key
+
+### 4. Database Setup
+
+The application requires the following Supabase tables:
+
+- [List your table names and brief descriptions]
+- Example: `invoices` - Stores invoice data
+- Example: `customers` - Stores customer information
+
+You can find the SQL schema in the `supabase/schema.sql` file (if provided), or import it directly in your Supabase SQL editor.
+
+## 🚀 Running the Application
+
+### Development Mode
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+The application will start at `http://localhost:5173` (default Vite port).
+
+### Production Build
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+# or
+yarn preview
+```
+
+## 🧪 Running Tests
+
+```bash
+npm run test
+# or
+yarn test
+```
+
+### Run Tests with Coverage
+
+```bash
+npm run test:coverage
+# or
+yarn test:coverage
+```
+
+## 📁 Project Structure
+
+```
+invoice-app/
+├── src/
+│   ├── components/        # Reusable UI components
+│   ├── pages/            # Page components
+│   ├── services/         # API and Supabase services
+│   ├── utils/            # Utility functions
+│   ├── tests__/        # Test files
+│   ├── App.tsx           # Main App component
+│   └── main.tsx          # Application entry point
+├── public/               # Static assets
+├── .env.example          # Example environment variables
+└── package.json          # Project dependencies
+```
+
+## 🔑 Key Components Tested
+
+The following critical components have comprehensive test coverage:
+
+- [List your tested components]
+- Example: Invoice form validation
+- Example: Authentication flow
+- Example: Invoice list rendering
+- Example: User permissions
+
+## 🔐 Authentication
+
+The application uses Supabase Authentication with the following features:
+
+- Email/Password authentication
+- [Add if applicable: OAuth providers]
+- Protected routes
+- Session management
+
+**Test Credentials (if applicable for judges):**
+
+```
+Email:admin@gmail.com
+Password: @Youverify123
+```
+
+## 🎨 UI/UX Features
+
+- Clean, modern interface with Tailwind CSS
+- Real-time toast notifications via Sonner
+- Responsive design for mobile, tablet, and desktop
+- [Add any other UI features]
+
+## 📝 Environment Variables Reference
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_SUPABASE_URL` | Your Supabase project URL | Yes |
+| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key | Yes |
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Issue:** Application won't start
+- **Solution:** Ensure all environment variables are correctly set in `.env` file
+
+**Issue:** Authentication errors
+- **Solution:** Verify your Supabase credentials and check that RLS policies are properly configured
+
+**Issue:** Database connection errors
+- **Solution:** Confirm your Supabase project is active and the URL is correct
+
+
+
+**Note for Judges:** If you encounter any issues during setup, please contact me at [your-email@example.com]. I'm available to provide support and answer any questions about the implementation.
