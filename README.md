@@ -15,7 +15,7 @@ A modern, full-featured invoice management application built with React 19 and p
 ## ✨ Features
 
 - User authentication and authorization
-- Create, read, update, and delete invoices
+- Reead, update invoices
 - Real-time data synchronization
 - Responsive design for all devices
 - Toast notifications for user feedback
@@ -25,7 +25,7 @@ A modern, full-featured invoice management application built with React 19 and p
 Before you begin, ensure you have the following installed:
 
 - **Node.js** (v18.0.0 or higher)
-- **npm** or **yarn** package manager
+- **npm** package manager
 - **Git**
 
 ## 🛠️ Installation & Setup
@@ -45,7 +45,7 @@ npm install
 
 ### 3. Environment Variables
 
-Create a `.env.local` file in the root directory and add your Supabase credentials:
+Create a `.env.local` file in the root directory and add the below Supabase credentials:
 
 ```env
 VITE_SUPABASE_URL="https://dafydjpsyykdejvgfkaf.supabase.co"
@@ -84,7 +84,7 @@ youVerify-test/
 │   ├── pages/            # Page components
 │   ├── services/         # API and Supabase services
 │   ├── utils/            # Utility functions
-│   ├── tests/        # Test files
+│   ├── test/        # Test files
 │   ├── App.tsx           # Main App component
 │   └── main.tsx          # Application entry point
 ├── public/               # Static assets
@@ -95,8 +95,8 @@ youVerify-test/
 ## 🔑 Key Components Tested
 
 The following critical components have comprehensive test coverage:
-- Example: Modal Component
-- Example: Invoice list rendering
+- Modal Component
+- Invoice list rendering
 
 ## 🔐 Authentication
 The application uses Supabase Authentication with the following features:
@@ -121,7 +121,7 @@ Password: @Youverify123
 ### Common Issues
 
 **Issue:** Application won't start
-- **Solution:** Ensure all environment variables are correctly set in `.env` file
+- **Solution:** Ensure all environment variables are correctly set in `.env.local` file
 
 
 
