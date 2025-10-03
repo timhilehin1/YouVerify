@@ -34,7 +34,7 @@ Before you begin, ensure you have the following installed:
 
 ```bash
 git clone [https://github.com/timhilehin1/YouVerify.git]
-cd youVerify-test
+cd YouVerify
 ```
 
 ### 2. Install Dependencies
