@@ -26,7 +26,7 @@ export function Tabs({ tabs, defaultTab }: TabsProps) {
             className={clsx(
               "flex-1 px-4 py-3 text-sm font-medium transition-colors",
               activeTab === tab.id
-                ? "text-[#003EFF] border-b-2 border-[#003EFF]"
+                ? "text-brand border-b-2 border-brand"
                 : "text-primary hover:text-coal"
             )}
           >

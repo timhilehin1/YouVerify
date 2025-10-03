@@ -10,7 +10,7 @@ const NotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4 sm:p-6">
       <div className="bg-white p-8 sm:p-10 rounded-xl shadow-lg text-center">
-        <h1 className="text-9xl font-extrabold text-[#003EFF]">404</h1>
+        <h1 className="text-9xl font-extrabold text-brand">404</h1>
 
         <p className="text-2xl font-semibold text-coal mt-4">
           Oops! Page Not Found
@@ -23,7 +23,7 @@ const NotFound = () => {
 
         <button
           onClick={handleGoToInvoice}
-          className="px-6 py-3 bg-[#003EFF] text-white font-medium rounded-full hover:bg-[#002BCC] transition duration-200 shadow-md cursor-pointer"
+          className="px-6 py-3 bg-brand text-white font-medium rounded-full hover:bg-[#002BCC] transition duration-200 shadow-md cursor-pointer"
         >
           Go Back to Invoices
         </button>

@@ -39,11 +39,18 @@ export function Modal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+
+      const handleEsc = (e: KeyboardEvent) => {
+        if (e.key === "Escape") onClose();
+      };
+      document.addEventListener("keydown", handleEsc);
+
+      return () => {
+        document.body.style.overflow = "";
+        document.removeEventListener("keydown", handleEsc);
+      };
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -51,6 +58,7 @@ export function Modal({
 
   return (
     <div
+      data-testid="modal-backdrop"
       className={clsx(
         "fixed inset-0 z-50 flex",
         "bg-gray-900/60 backdrop-blur-sm transition-all duration-300 ease-in-out",
@@ -72,6 +80,10 @@ export function Modal({
       >
         {/* MODAL CONTENT */}
         <div
+          role="dialog"
+          aria-modal="true"
+          data-testid="modal-content"
+          data-position={isFullscreen ? "fullscreen" : "centered"}
           className={clsx(
             "relative w-full bg-white rounded-xl shadow-2xl",
             // Fullscreen: takes maximum space with margins

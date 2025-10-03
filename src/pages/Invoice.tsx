@@ -118,10 +118,10 @@ const Invoice = () => {
   // Calculate totals from selected invoice items
   const subtotal =
     selectedInvoice?.invoice_items?.reduce(
-      (sum, item) => sum + Number(item.unit_price),
+      (sum, item) => sum + Number(item.total_price),
       0
     ) || 0;
-  const discountRate = 0.025; // 2.5%
+  const discountRate = 0.025;
   const discount = subtotal * discountRate;
   const totalAmountDue = subtotal - discount;
   return (
@@ -180,7 +180,7 @@ const Invoice = () => {
             title="Create New Invoice"
             description="Create new invoices easily "
             onAction={handleInvoiceAction}
-            bgClass="bg-[#003EFF] shadow-sm"
+            bgClass="bg-brand shadow-sm"
             titleClass="text-white"
             descriptionClass="text-[#F6F8FA]"
           />
@@ -523,7 +523,7 @@ const Invoice = () => {
                   Invoice Activities
                 </p>
                 <div className="space-y-6">
-                  {[1, 2, 354, 8484, 7, 8].map((item) => (
+                  {[1, 2, 3, 4, 5, 6].map((item) => (
                     <ActivityItem
                       key={item}
                       actorName="Oladapo Timilehin"
@@ -605,7 +605,7 @@ const Invoice = () => {
                                   ISSUE DATE
                                 </p>
                                 <p className="text-coal text-xs">
-                                {formatDate(selectedInvoice.created_at!)}
+                                  {formatDate(selectedInvoice.created_at!)}
                                 </p>
                               </div>
                               <div>
@@ -759,7 +759,7 @@ const Invoice = () => {
                           Invoice Activities
                         </p>
                         <div className="space-y-6">
-                          {[1, 2, 354, 8484, 7, 8].map((item) => (
+                          {[1, 2, 3, 4, 5, 6].map((item) => (
                             <ActivityItem
                               key={item}
                               actorName="Oladapo Timilehin"

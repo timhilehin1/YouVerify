@@ -3,7 +3,7 @@ import { formatCurrency } from "../../utils/constant";
 
 type InvoiceStatus = "draft" | "overdue" | "paid" | "pending" | "unpaid";
 
-interface InvoiceItemProps {
+ export interface InvoiceItemProps {
   id: string;
   dueDate: string;
   amount: string;

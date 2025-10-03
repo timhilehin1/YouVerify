@@ -26,11 +26,10 @@ export function Button({
   const focus = "focus:outline-none focus:ring-2 focus:ring-offset-2";
 
   const variants = {
-    primary: "bg-[#003EFF] text-white hover:bg-[#002BCC] focus:ring-[#003EFF]",
+    primary: "bg-brand text-white hover:bg-[#002BCC] focus:ring-brand",
     secondary:
       "bg-white text-primary border border-[#E3E6EF] hover:bg-gray-50 focus:ring-[#E3E6EF]",
-    tertiary:
-      "bg-white text-[#003EFF] border border-[#E3E6EF] focus:ring-[#003EFF]",
+    tertiary: "bg-white text-brand border border-[#E3E6EF] focus:ring-brand",
   };
 
   const sizes = {

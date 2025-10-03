@@ -29,8 +29,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const { email, password } = formData;
-    console.log("email", email);
-    console.log("password", password);
+
     setLoading(true);
 
     try {
