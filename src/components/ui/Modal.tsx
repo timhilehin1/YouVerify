@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import clsx from "clsx";
-import CloseIcon from "./icons/CloseIcon"; // Ensure this path is correct
+import CloseIcon from "./icons/CloseIcon"; 
 
-// --- Type Definitions ---
 type ModalSize = "sm" | "md" | "lg" | "full";
 type ModalPosition = "centered" | "fullscreen";
 
@@ -10,7 +9,6 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  // Customization
   size?: ModalSize;
   position?: ModalPosition;
   className?: string;
@@ -25,7 +23,7 @@ const centeredSizeClasses: Record<Exclude<ModalSize, "full">, string> = {
   lg: "max-w-4xl",
 };
 
-// --- The Modal Component ---
+
 export function Modal({
   isOpen,
   onClose,
@@ -86,12 +84,12 @@ export function Modal({
           data-position={isFullscreen ? "fullscreen" : "centered"}
           className={clsx(
             "relative w-full bg-white rounded-xl shadow-2xl",
-            // Fullscreen: takes maximum space with margins
+            
             isFullscreen && [
               "min-h-[calc(100vh-2rem)] sm:min-h-[calc(100vh-3rem)] md:min-h-[calc(100vh-5rem)]",
               "my-auto",
             ],
-            // Centered: content-based height with minimum
+           
             !isFullscreen && [
               "min-h-[200px]",
               "my-8",

@@ -8,7 +8,7 @@ interface ActivityItemProps {
   actionTitle: string;
   timestamp: string;
   className?: string;
-  invoiceId: string; // e.g., "00239434"
+  invoiceId: string; 
   adminName: string;
   description: string;
 }

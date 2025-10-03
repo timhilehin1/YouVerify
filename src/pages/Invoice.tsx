@@ -59,7 +59,6 @@ const Invoice = () => {
       }
     };
 
-    // Initial fetch
     fetchData();
 
     // Set up realtime subscription
@@ -74,8 +73,6 @@ const Invoice = () => {
         },
         (payload) => {
           console.log("Change received!", payload);
-
-          // Handle different event types
           if (payload.eventType === "INSERT") {
             setInvoices((prev) => [payload.new as InvoiceData, ...prev]);
           } else if (payload.eventType === "UPDATE") {
@@ -93,7 +90,6 @@ const Invoice = () => {
               )
             );
           }
-
           // Refresh stats after any change
           getInvoiceStats().then((statsData) => setStats(statsData || {}));
         }

@@ -7,7 +7,6 @@ export async function getInvoiceStats() {
 
   if (error) throw error;
 
-  // reduce to counts + sums in JS
   const stats = data.reduce((acc, row) => {
     if (!acc[row.status]) acc[row.status] = { count: 0, total: 0 };
     acc[row.status].count += 1;
