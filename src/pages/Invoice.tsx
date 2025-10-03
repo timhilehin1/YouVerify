@@ -32,7 +32,7 @@ const Invoice = () => {
     Record<string, { count: number; total: number }>
   >({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_, setError] = useState<string | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData>(
     {} as InvoiceData
   );
@@ -605,7 +605,7 @@ const Invoice = () => {
                                   ISSUE DATE
                                 </p>
                                 <p className="text-coal text-xs">
-                                  {selectedInvoice.created_at}
+                                {formatDate(selectedInvoice.created_at!)}
                                 </p>
                               </div>
                               <div>
